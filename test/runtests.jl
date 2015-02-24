@@ -1,5 +1,106 @@
-using UnitQuaternions
 using Base.Test
+using UnitQuaternions
 
-# write your own tests here
-@test 1 == 1
+####################################################################################################
+# Constructors
+####################################################################################################
+
+print("Testing constructors...")
+
+q = UnitQuaternion([1, 1, 1], 1)
+for i = 1:4
+    @test_approx_eq q[i] 0.5
+end
+
+@test_throws ErrorException UnitQuaternion([1, 1, 1, 1], 1)
+
+@test ι == UnitQuaternion([0, 0, 0], 1)
+
+for i = 1:100
+    a, b, c, d = 5randn(4)
+    p = UnitQuaternion(a, b, c, d)
+    q = UnitQuaternion([a, b, c, d])
+    @test p == UnitQuaternion([a, b, c], d)
+    @test q == UnitQuaternion([a, b, c], d)
+    @test p == q
+    @test_approx_eq sqrt(q.η^2 + norm(q.ϵ)^2) 1
+end
+
+@test UnitQuaternion([0, 0, 0]) == ι
+@test UnitQuaternion([π, 0, 0]) == UnitQuaternion(1, 0, 0, 0)
+@test UnitQuaternion([2π, 0, 0]) == UnitQuaternion(0, 0, 0, -1)
+@test UnitQuaternion([0, π/2, 0]) == UnitQuaternion(0, sqrt(2)/2, 0, sqrt(2)/2)
+@test UnitQuaternion([0, 0, π/3]) == UnitQuaternion(0, 0, 0.5, sqrt(3)/2)
+
+println(" done.")
+
+####################################################################################################
+# Operators
+####################################################################################################
+
+print("Testing operators...")
+
+@test_approx_eq +(ι) eye(4)
+@test_approx_eq +(UnitQuaternion(1, 0, 0, 0)) [0 0 0 1; 0 0 1 0; 0 -1 0 0; -1 0 0 0]
+@test_approx_eq +(UnitQuaternion(1, 1, 1, 1)) [ 0.5  0.5 -0.5  0.5; 
+                                               -0.5  0.5  0.5  0.5;
+                                                0.5 -0.5  0.5  0.5;
+                                               -0.5 -0.5 -0.5  0.5;]
+
+@test UnitQuaternion(1, 2, 3, 4) + ι == UnitQuaternion(1, 2, 3, 4)
+@test ι + UnitQuaternion(1, 2, 3, 4) == UnitQuaternion(1, 2, 3, 4)
+@test UnitQuaternion(1, 2, 3, 4) ⊕ ι == UnitQuaternion(1, 2, 3, 4)
+@test ι ⊕ UnitQuaternion(1, 2, 3, 4) == UnitQuaternion(1, 2, 3, 4)
+
+p = UnitQuaternion(sqrt(2)/2, 0, 0, sqrt(2)/2)
+q = UnitQuaternion(0, 0, sqrt(2)/2, sqrt(2)/2)
+@test p + q == UnitQuaternion(0.5, 0.5, 0.5, 0.5)
+@test q ⊕ p == UnitQuaternion(0.5, 0.5, 0.5, 0.5)
+@test q + p == UnitQuaternion(0.5, -0.5, 0.5, 0.5)
+@test p ⊕ q == UnitQuaternion(0.5, -0.5, 0.5, 0.5)
+
+r = UnitQuaternion(4, 3, -1, -3)
+@test -r == UnitQuaternion(-4, -3, 1, 3)
+
+@test q ⊞ [0, 0, 0] == q
+@test p ⊞ (q ⊟ p) == q
+@test_approx_eq (q ⊞ [0.1, 0.2, 0.3]) ⊟ q [0.1, 0.2, 0.3]
+
+r = inv(p) + q
+@test r == UnitQuaternion(-0.5, -0.5, 0.5, 0.5)
+@test_approx_eq q ⊟ p 2atan2(norm(r.ϵ), r.η) * r.ϵ / norm(r.ϵ)
+
+@test p ⊞ [0, 0, π/2] == UnitQuaternion(0.5, 0.5, 0.5, 0.5)
+
+@test_throws BoundsError q[5]
+@test_approx_eq q[1] 0
+@test_approx_eq q[4] sqrt(2)/2
+
+println(" done.")
+
+####################################################################################################
+# Methods
+####################################################################################################
+
+print("Testing methods...")
+
+q = UnitQuaternion(0, 0, sqrt(2)/2, sqrt(2)/2)
+
+@test_approx_eq angle(q) π/2
+
+@test_approx_eq axis(q) [0, 0, 1]
+
+@test inv(q) == UnitQuaternion(0, 0, -sqrt(2)/2, sqrt(2)/2)
+
+@test_approx_eq log(ι) [0, 0, 0]
+@test_approx_eq log(UnitQuaternion(1, 1, 1, 0)) π/2 * [sqrt(3)/3, sqrt(3)/3, sqrt(3)/3]
+@test_approx_eq log(q) [0, 0, π/4]
+
+@test_approx_eq rotatevector(q, [1, 0, 0]) [0, 1, 0]
+p = UnitQuaternion(0.5, 0.5, 0.5, 0.5)
+@test_approx_eq rotatevector(p, [1, 0, 0]) [0, 1, 0]
+
+@test_approx_eq vector(ι) [0, 0, 0, 1]
+@test_approx_eq vector(q) [0, 0, sqrt(2)/2, sqrt(2)/2]
+
+println(" done.")
