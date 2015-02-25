@@ -19,9 +19,9 @@ immutable UnitQuaternion{T<:FloatingPoint}
         # normalization algorithm taken from http://stackoverflow.com/a/12934750/1053656
         squared_mag = η * η + sum(abs2(ϵ))
         if abs(1 - squared_mag) < 2.107342e-08
-            scale = 2 / (1 + squared_mag)
+            scale = 2.0 / (1.0 + squared_mag)
         else
-            scale = 1 / sqrt(squared_mag)
+            scale = 1.0 / sqrt(squared_mag)
         end
         new(ϵ * scale, η * scale)
     end
@@ -84,7 +84,7 @@ getindex(q::UnitQuaternion, i::Integer) = i == 4 ? q.η : q.ϵ[i]
 # Methods
 ####################################################################################################
 
-angle(q::UnitQuaternion) = 2atan2(norm(q.ϵ), q.η)
+angle(q::UnitQuaternion) = 2.0 * atan2(norm(q.ϵ), q.η)
 
 axis(q::UnitQuaternion) = norm(q.ϵ) > EPS ? q.ϵ / norm(q.ϵ) : [0.0, 0.0, 1.0]
 
@@ -101,7 +101,7 @@ function log(q::UnitQuaternion)
     elseif abs(q.η) < EPS
         return π/2 * axis(q)
     else
-        return angle(q)/2 * axis(q)
+        return angle(q)/2.0 * axis(q)
     end
 end
 
@@ -117,7 +117,7 @@ vector(q::UnitQuaternion) = [q.ϵ[1], q.ϵ[2], q.ϵ[3], q.η]
 
 function _cross{T<:Real}(a::Vector{T})  
     length(a) == 3 || error("Must be a 3-vector.")
-    [0 -a[3] a[2]; a[3] 0 -a[1]; -a[2] a[1] 0]
+    [0.0 -a[3] a[2]; a[3] 0.0 -a[1]; -a[2] a[1] 0.0]
 end
 
 end # module
