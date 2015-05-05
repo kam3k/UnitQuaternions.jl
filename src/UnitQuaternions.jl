@@ -1,6 +1,7 @@
 module UnitQuaternions
 
 import Base: +, -, angle, inv, log, show, getindex
+import Directionals: ⊞, ⊟, axis, vector
 
 export UnitQuaternion, ⊕, ⊞, ⊟, ι, axis, rotatevector, vector
 
