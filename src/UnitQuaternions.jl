@@ -106,7 +106,8 @@ function log(q::UnitQuaternion)
 end
 
 function show(io::IO, q::UnitQuaternion)
-    print(io, "ϵ = [$(q.ϵ[1]) $(q.ϵ[2]) $(q.ϵ[3])], η = $(q.η)")
+    out = @sprintf("ϵ = [%.3f, %.3f, %.3f], η = %.3f", q.ϵ[1], q.ϵ[2], q.ϵ[3], q.η)
+    print(io, out)
 end
 
 vector(q::UnitQuaternion) = [q.ϵ[1], q.ϵ[2], q.ϵ[3], q.η]
