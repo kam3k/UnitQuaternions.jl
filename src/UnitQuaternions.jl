@@ -23,7 +23,7 @@ immutable UnitQuaternion{T<:FloatingPoint}
         else
             scale = 1.0 / sqrt(squared_mag)
         end
-        new(ϵ * scale, η * scale)
+        η >= 0 ? new(ϵ * scale, η * scale) : new(-ϵ * scale, -η * scale)
     end
 end
 
