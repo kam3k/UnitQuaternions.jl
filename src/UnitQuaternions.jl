@@ -2,7 +2,7 @@ module UnitQuaternions
 
 import Base: +, -, angle, inv, log, show, getindex
 
-export UnitQuaternion, ⊕, ⊞, ⊟, ι, axis, rotatevector, vector
+export UnitQuaternion, ⊕, ⊞, ⊟, ι, axis, rotatevector, rotateframe, vector
 
 const EPS = 1e-9
 
@@ -90,9 +90,14 @@ axis(q::UnitQuaternion) = norm(q.ϵ) > EPS ? q.ϵ / norm(q.ϵ) : [0.0, 0.0, 1.0]
 
 inv(q::UnitQuaternion) = UnitQuaternion(-q.ϵ, q.η)
 
+function rotateframe(q::UnitQuaternion, v::AbstractVector)
+    length(v) == 3 || error("Must be a 3-vector.")
+    (2q.η*q.η - 1)*v + 2dot(v, q.ϵ)*q.ϵ + 2q.η*cross(v, q.ϵ)
+end
+
 function rotatevector(q::UnitQuaternion, v::AbstractVector)
     length(v) == 3 || error("Must be a 3-vector.")
-    (2q.η*q.η - 1)*v + 2dot(q.ϵ, v)*q.ϵ + 2q.η*cross(q.ϵ, v)
+    (q.η*q.η - sum(abs2(q.ϵ)))*v + 2dot(q.ϵ, v)*q.ϵ + 2q.η*cross(q.ϵ, v)
 end
 
 function log(q::UnitQuaternion)
