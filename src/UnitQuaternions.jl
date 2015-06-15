@@ -51,13 +51,13 @@ end
 # Operators
 ####################################################################################################
 
-+(q::UnitQuaternion) = [q.η * eye(3) - _cross(q.ϵ) q.ϵ; -q.ϵ' q.η]
++(q::UnitQuaternion) = [q.η * eye(3) - ×(q.ϵ) q.ϵ; -q.ϵ' q.η]
 
 +(p::UnitQuaternion, q::UnitQuaternion) = UnitQuaternion(+(p) * vector(q))
 
 -(q::UnitQuaternion) = UnitQuaternion(-q.ϵ, -q.η)
 
-⊕(q::UnitQuaternion) = [q.η * eye(3) + _cross(q.ϵ) q.ϵ; -q.ϵ' q.η]
+⊕(q::UnitQuaternion) = [q.η * eye(3) + ×(q.ϵ) q.ϵ; -q.ϵ' q.η]
 
 ⊕(p::UnitQuaternion, q::UnitQuaternion) = UnitQuaternion(⊕(p) * vector(q))
 
@@ -117,7 +117,7 @@ vector(q::UnitQuaternion) = [q.ϵ[1], q.ϵ[2], q.ϵ[3], q.η]
 # Utility Functions
 ####################################################################################################
 
-function _cross(a::AbstractVector)  
+function ×(a::AbstractVector)  
     length(a) == 3 || error("Must be a 3-vector.")
     return [0.0 -a[3] a[2]; a[3] 0.0 -a[1]; -a[2] a[1] 0.0]
 end
