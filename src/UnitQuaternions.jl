@@ -10,20 +10,21 @@ const EPS = 1e-9
 # Type Definition
 ####################################################################################################
 
-immutable UnitQuaternion{T<:FloatingPoint}
-    ϵ::Vector{T}
-    η::T
+immutable UnitQuaternion
+    ϵ::Vector{Float64}
+    η::Float64
 
     function UnitQuaternion(ϵ, η) 
-        η = abs(η) < EPS ? 0.0 : η # small scalars are exactly zero
+        length(ϵ) == 3 || error("Must be a 3-vector.")
+        η = abs(η) < EPS ? zero(η) : η # small scalars are exactly zero
         # normalization algorithm taken from http://stackoverflow.com/a/12934750/1053656
         squared_mag = η * η + sum(abs2(ϵ))
-        if abs(1 - squared_mag) < 2.107342e-08
+        if abs(one(squared_mag) - squared_mag) < 2.107342e-08
             scale = 2.0 / (1.0 + squared_mag)
         else
             scale = 1.0 / sqrt(squared_mag)
         end
-        η >= 0 ? new(ϵ * scale, η * scale) : new(-ϵ * scale, -η * scale)
+        η >= zero(η) ? new(ϵ * scale, η * scale) : new(-ϵ * scale, -η * scale)
     end
 end
 
@@ -31,19 +32,14 @@ end
 # Constructors
 ####################################################################################################
 
-function UnitQuaternion{T<:Real}(ϵ::AbstractVector, η::T) 
-    length(ϵ) == 3 || error("Must be a 3-vector.")
-    UnitQuaternion{Float64}(float(ϵ), float(η))
-end
-
-const ι = UnitQuaternion([0, 0, 0], 1)
+UnitQuaternion() = UnitQuaternion([0, 0, 0], 1)
 
 UnitQuaternion(ϵ1::Real, ϵ2::Real, ϵ3::Real, η::Real) = UnitQuaternion([ϵ1, ϵ2, ϵ3], η)
 
 function UnitQuaternion(v::AbstractVector) 
     if length(v) == 3
         θ = norm(v)
-        return θ > EPS ? UnitQuaternion(sin(θ/2) * v / θ, cos(θ/2)) : ι
+        return θ > EPS ? UnitQuaternion(sin(θ/2.0) * v / θ, cos(θ/2.0)) : UnitQuaternion()
     elseif length(v) == 4
         return UnitQuaternion([v[1], v[2], v[3]], v[4])
     else
@@ -65,9 +61,9 @@ end
 
 ⊕(p::UnitQuaternion, q::UnitQuaternion) = UnitQuaternion(⊕(p) * vector(q))
 
-⊟(p::UnitQuaternion, q::UnitQuaternion) = 2log(inv(q) + p)
+⊟(p::UnitQuaternion, q::UnitQuaternion) = 2.0 * log(inv(q) + p)
 
-function ⊞(q::UnitQuaternion, rotationvector::AbstractArray) 
+function ⊞(q::UnitQuaternion, rotationvector::AbstractVector) 
     length(rotationvector) == 3 || error("Must be 3-vector.")
     q + UnitQuaternion(rotationvector)
 end
@@ -92,16 +88,16 @@ inv(q::UnitQuaternion) = UnitQuaternion(-q.ϵ, q.η)
 
 function rotateframe(q::UnitQuaternion, v::AbstractVector)
     length(v) == 3 || error("Must be a 3-vector.")
-    (2q.η*q.η - 1)*v + 2dot(v, q.ϵ)*q.ϵ + 2q.η*cross(v, q.ϵ)
+    (2.0 * q.η*q.η - 1.0)*v + 2.0 * dot(v, q.ϵ)*q.ϵ + 2.0 * q.η*cross(v, q.ϵ)
 end
 
 function rotatevector(q::UnitQuaternion, v::AbstractVector)
     length(v) == 3 || error("Must be a 3-vector.")
-    (q.η*q.η - sum(abs2(q.ϵ)))*v + 2dot(q.ϵ, v)*q.ϵ + 2q.η*cross(q.ϵ, v)
+    (q.η*q.η - sum(abs2(q.ϵ)))*v + 2.0 * dot(q.ϵ, v)*q.ϵ + 2.0 * q.η*cross(q.ϵ, v)
 end
 
 function log(q::UnitQuaternion)
-    if q == ι
+    if q == UnitQuaternion()
         return [0.0, 0.0, 0.0]
     elseif abs(q.η) < EPS
         return π/2 * axis(q)
@@ -121,9 +117,9 @@ vector(q::UnitQuaternion) = [q.ϵ[1], q.ϵ[2], q.ϵ[3], q.η]
 # Utility Functions
 ####################################################################################################
 
-function _cross{T<:Real}(a::Vector{T})  
+function _cross(a::AbstractVector)  
     length(a) == 3 || error("Must be a 3-vector.")
-    [0.0 -a[3] a[2]; a[3] 0.0 -a[1]; -a[2] a[1] 0.0]
+    return [0.0 -a[3] a[2]; a[3] 0.0 -a[1]; -a[2] a[1] 0.0]
 end
 
 end # module

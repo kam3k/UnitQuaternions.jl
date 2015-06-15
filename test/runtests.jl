@@ -14,7 +14,7 @@ end
 
 @test_throws ErrorException UnitQuaternion([1, 1, 1, 1], 1)
 
-@test ι == UnitQuaternion([0, 0, 0], 1)
+@test UnitQuaternion() == UnitQuaternion([0, 0, 0], 1)
 
 for i = 1:100
     a, b, c, d = 5randn(4)
@@ -26,7 +26,7 @@ for i = 1:100
     @test_approx_eq sqrt(q.η^2 + norm(q.ϵ)^2) 1
 end
 
-@test UnitQuaternion([0, 0, 0]) == ι
+@test UnitQuaternion([0, 0, 0]) == UnitQuaternion()
 @test UnitQuaternion([π, 0, 0]) == UnitQuaternion(1, 0, 0, 0)
 @test UnitQuaternion([2π, 0, 0]) == UnitQuaternion(0, 0, 0, -1)
 @test UnitQuaternion([0, π/2, 0]) == UnitQuaternion(0, sqrt(2)/2, 0, sqrt(2)/2)
@@ -40,17 +40,17 @@ println(" done.")
 
 print("Testing operators...")
 
-@test_approx_eq +(ι) eye(4)
+@test_approx_eq +(UnitQuaternion()) eye(4)
 @test_approx_eq +(UnitQuaternion(1, 0, 0, 0)) [0 0 0 1; 0 0 1 0; 0 -1 0 0; -1 0 0 0]
 @test_approx_eq +(UnitQuaternion(1, 1, 1, 1)) [ 0.5  0.5 -0.5  0.5; 
                                                -0.5  0.5  0.5  0.5;
                                                 0.5 -0.5  0.5  0.5;
                                                -0.5 -0.5 -0.5  0.5;]
 
-@test UnitQuaternion(1, 2, 3, 4) + ι == UnitQuaternion(1, 2, 3, 4)
-@test ι + UnitQuaternion(1, 2, 3, 4) == UnitQuaternion(1, 2, 3, 4)
-@test UnitQuaternion(1, 2, 3, 4) ⊕ ι == UnitQuaternion(1, 2, 3, 4)
-@test ι ⊕ UnitQuaternion(1, 2, 3, 4) == UnitQuaternion(1, 2, 3, 4)
+@test UnitQuaternion(1, 2, 3, 4) + UnitQuaternion() == UnitQuaternion(1, 2, 3, 4)
+@test UnitQuaternion() + UnitQuaternion(1, 2, 3, 4) == UnitQuaternion(1, 2, 3, 4)
+@test UnitQuaternion(1, 2, 3, 4) ⊕ UnitQuaternion() == UnitQuaternion(1, 2, 3, 4)
+@test UnitQuaternion() ⊕ UnitQuaternion(1, 2, 3, 4) == UnitQuaternion(1, 2, 3, 4)
 
 p = UnitQuaternion(sqrt(2)/2, 0, 0, sqrt(2)/2)
 q = UnitQuaternion(0, 0, sqrt(2)/2, sqrt(2)/2)
@@ -92,7 +92,7 @@ q = UnitQuaternion(0, 0, sqrt(2)/2, sqrt(2)/2)
 
 @test inv(q) == UnitQuaternion(0, 0, -sqrt(2)/2, sqrt(2)/2)
 
-@test_approx_eq log(ι) [0, 0, 0]
+@test_approx_eq log(UnitQuaternion()) [0, 0, 0]
 @test_approx_eq log(UnitQuaternion(1, 1, 1, 0)) π/2 * [sqrt(3)/3, sqrt(3)/3, sqrt(3)/3]
 @test_approx_eq log(q) [0, 0, π/4]
 
@@ -100,7 +100,7 @@ q = UnitQuaternion(0, 0, sqrt(2)/2, sqrt(2)/2)
 p = UnitQuaternion(0.5, 0.5, 0.5, 0.5)
 @test_approx_eq rotatevector(p, [1, 0, 0]) [0, 1, 0]
 
-@test_approx_eq vector(ι) [0, 0, 0, 1]
+@test_approx_eq vector(UnitQuaternion()) [0, 0, 0, 1]
 @test_approx_eq vector(q) [0, 0, sqrt(2)/2, sqrt(2)/2]
 
 println(" done.")
