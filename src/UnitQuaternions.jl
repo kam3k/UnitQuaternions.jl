@@ -2,7 +2,7 @@ module UnitQuaternions
 
 import Base: +, -, angle, inv, log, show, getindex
 
-export UnitQuaternion, ⊕, ⊞, ⊟, ι, axis, rotatevector, rotateframe, vector
+export UnitQuaternion, ⊕, ⊞, ⊟, axis, rotatevector, rotateframe, vector
 
 const EPS = 1e-9
 
