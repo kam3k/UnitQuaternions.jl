@@ -90,7 +90,37 @@ q = UnitQuaternion(0, 0, sqrt(2)/2, sqrt(2)/2)
 
 @test_approx_eq axis(q) [0, 0, 1]
 
+qmean = UnitQuaternion(sind(90/2), 0, 0, cosd(90/2))
+v = [UnitQuaternion(sind(60/2), 0, 0, cosd(60/2)), UnitQuaternion(sind(120/2), 0, 0, cosd(120/2))]
+cov = covariance(v, qmean, [1, 1])
+@test_approx_eq rad2deg(sqrt(cov[1])) sqrt(30^2 + 30^2)
+
 @test inv(q) == UnitQuaternion(0, 0, -sqrt(2)/2, sqrt(2)/2)
+
+qs = [UnitQuaternion(), UnitQuaternion()]
+weights = [rand(), rand()]
+@test mean(qs, weights) == UnitQuaternion()
+@test mean(qs) == UnitQuaternion()
+qs = [UnitQuaternion(1, 0, 0, 0), UnitQuaternion(1, 0, 0, 0)]
+weights = [rand(), rand()]
+@test mean(qs, weights) == UnitQuaternion(1, 0, 0, 0)
+@test mean(qs) == UnitQuaternion(1, 0, 0, 0)
+qs = [UnitQuaternion(1.1, 0, 0, 0), UnitQuaternion(0.9, 0, 0, 0)]
+weights = [1, 1]
+@test mean(qs, weights) == UnitQuaternion(1, 0, 0, 0)
+@test mean(qs) == UnitQuaternion(1, 0, 0, 0)
+qs = [UnitQuaternion(0, 1.2, 0, 0), UnitQuaternion(0, 0.8, 0, 0)]
+weights = [1, 1]
+@test mean(qs, weights) == UnitQuaternion(0, 1, 0, 0)
+@test mean(qs) == UnitQuaternion(0, 1, 0, 0)
+qs = [UnitQuaternion(0, 0, 1.3, 0), UnitQuaternion(0, 0, 0.7, 0)]
+weights = [1, 1]
+@test mean(qs, weights) == UnitQuaternion(0, 0, 1, 0)
+@test mean(qs) == UnitQuaternion(0, 0, 1, 0)
+qs = [UnitQuaternion(0, 0, 0, 1.4), UnitQuaternion(0, 0, 0, 0.6)]
+weights = [1, 1]
+@test mean(qs, weights) == UnitQuaternion(0, 0, 0, 1)
+@test mean(qs) == UnitQuaternion(0, 0, 0, 1)
 
 @test_approx_eq log(UnitQuaternion()) [0, 0, 0]
 @test_approx_eq log(UnitQuaternion(1, 1, 1, 0)) π/2 * [sqrt(3)/3, sqrt(3)/3, sqrt(3)/3]

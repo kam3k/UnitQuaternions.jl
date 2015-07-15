@@ -1,8 +1,8 @@
 module UnitQuaternions
 
-import Base: +, -, angle, inv, log, show, getindex
+import Base: +, -, angle, inv, log, mean, show, getindex
 
-export UnitQuaternion, ⊕, ⊞, ⊟, axis, rotatevector, rotateframe, vector
+export UnitQuaternion, ⊕, ⊞, ⊟, axis, covariance, rotatevector, rotateframe, vector
 
 const EPS = 1e-9
 
@@ -84,7 +84,30 @@ angle(q::UnitQuaternion) = 2.0 * atan2(norm(q.ϵ), q.η)
 
 axis(q::UnitQuaternion) = norm(q.ϵ) > EPS ? q.ϵ / norm(q.ϵ) : [0.0, 0.0, 1.0]
 
+function covariance{T<:Real}(v::AbstractVector{UnitQuaternion}, qmean::UnitQuaternion,
+                             weights::Vector{T} = ones(length(v)))
+    cov = zeros(3, 3)
+    for i = 1:length(v)
+        diff = v[i] ⊟ qmean
+        cov += weights[i] * diff * diff'
+    end
+    return cov
+end
+
+function covariance{T<:Real}(v::AbstractVector{UnitQuaternion}, weights::Vector{T} = ones(length(v)))
+    qmean = mean(v, weights)
+    return covariance(v, qmean, weights)
+end
+
 inv(q::UnitQuaternion) = UnitQuaternion(-q.ϵ, q.η)
+
+function mean{T<:Real}(v::AbstractVector{UnitQuaternion}, weights::Vector{T} = ones(length(v)))
+    normweights = [w/norm(weights) for w in weights]
+    M = sum([w * vector(q) * vector(q)' for (w, q) in zip(normweights, v)])
+    evals, evecs = eig(M)
+    largestevalindex = sortperm(evals)[end]
+    return UnitQuaternion(evecs[:,largestevalindex])
+end
 
 function rotateframe(q::UnitQuaternion, v::AbstractVector)
     length(v) == 3 || error("Must be a 3-vector.")
