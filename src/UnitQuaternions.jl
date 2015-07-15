@@ -86,10 +86,11 @@ axis(q::UnitQuaternion) = norm(q.ϵ) > EPS ? q.ϵ / norm(q.ϵ) : [0.0, 0.0, 1.0]
 
 function covariance{T<:Real}(v::AbstractVector{UnitQuaternion}, qmean::UnitQuaternion,
                              weights::Vector{T} = ones(length(v)))
+    normweights = [w/norm(weights) for w in weights]
     cov = zeros(3, 3)
     for i = 1:length(v)
         diff = v[i] ⊟ qmean
-        cov += weights[i] * diff * diff'
+        cov += normweights[i] * diff * diff'
     end
     return cov
 end
