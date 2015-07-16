@@ -93,7 +93,7 @@ q = UnitQuaternion(0, 0, sqrt(2)/2, sqrt(2)/2)
 qmean = UnitQuaternion(sind(90/2), 0, 0, cosd(90/2))
 v = [UnitQuaternion(sind(60/2), 0, 0, cosd(60/2)), UnitQuaternion(sind(120/2), 0, 0, cosd(120/2))]
 cov = covariance(v, qmean, [1, 1])
-@test_approx_eq rad2deg(sqrt(cov[1])) sqrt(30^2 + 30^2)
+@test_approx_eq rad2deg(sqrt(cov[1])) 30
 
 @test inv(q) == UnitQuaternion(0, 0, -sqrt(2)/2, sqrt(2)/2)
 

@@ -86,7 +86,7 @@ axis(q::UnitQuaternion) = norm(q.ϵ) > EPS ? q.ϵ / norm(q.ϵ) : [0.0, 0.0, 1.0]
 
 function covariance{T<:Real}(v::AbstractVector{UnitQuaternion}, qmean::UnitQuaternion,
                              weights::Vector{T} = ones(length(v)))
-    normweights = [w/norm(weights) for w in weights]
+    normweights = map(w -> w/sum(weights), weights)
     cov = zeros(3, 3)
     for i = 1:length(v)
         diff = v[i] ⊟ qmean
@@ -103,7 +103,7 @@ end
 inv(q::UnitQuaternion) = UnitQuaternion(-q.ϵ, q.η)
 
 function mean{T<:Real}(v::AbstractVector{UnitQuaternion}, weights::Vector{T} = ones(length(v)))
-    normweights = [w/norm(weights) for w in weights]
+    normweights = map(w -> w/sum(weights), weights)
     M = sum([w * vector(q) * vector(q)' for (w, q) in zip(normweights, v)])
     evals, evecs = eig(M)
     largestevalindex = sortperm(evals)[end]
