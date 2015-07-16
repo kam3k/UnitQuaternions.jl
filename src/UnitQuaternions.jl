@@ -1,8 +1,8 @@
 module UnitQuaternions
 
-import Base: +, -, angle, inv, log, mean, show, getindex
+import Base: +, -, ^, angle, inv, log, mean, show, getindex
 
-export UnitQuaternion, ⊕, ⊞, ⊟, axis, covariance, rotatevector, rotateframe, vector
+export UnitQuaternion, ⊕, ⊞, ⊟, axis, covariance, rotatevector, rotateframe, slerp, vector
 
 const EPS = 1e-9
 
@@ -56,6 +56,9 @@ end
 +(p::UnitQuaternion, q::UnitQuaternion) = UnitQuaternion(+(p) * vector(q))
 
 -(q::UnitQuaternion) = UnitQuaternion(-q.ϵ, -q.η)
+
+^(q::UnitQuaternion, n::Integer) = UnitQuaternion(2n * log(q))
+^(q::UnitQuaternion, n::Real) = UnitQuaternion(2n * log(q))
 
 ⊕(q::UnitQuaternion) = [q.η * eye(3) + ×(q.ϵ) q.ϵ; -q.ϵ' q.η]
 
@@ -130,6 +133,8 @@ function show(io::IO, q::UnitQuaternion)
     out = @sprintf("ϵ = [%.3f, %.3f, %.3f], η = %.3f", q.ϵ[1], q.ϵ[2], q.ϵ[3], q.η)
     print(io, out)
 end
+
+slerp(p::UnitQuaternion, q::UnitQuaternion, t::Real) = (q + inv(p))^t + p
 
 vector(q::UnitQuaternion) = [q.ϵ[1], q.ϵ[2], q.ϵ[3], q.η]
 

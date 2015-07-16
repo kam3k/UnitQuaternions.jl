@@ -52,6 +52,13 @@ print("Testing operators...")
 @test UnitQuaternion(1, 2, 3, 4) ⊕ UnitQuaternion() == UnitQuaternion(1, 2, 3, 4)
 @test UnitQuaternion() ⊕ UnitQuaternion(1, 2, 3, 4) == UnitQuaternion(1, 2, 3, 4)
 
+q = UnitQuaternion()
+@test q^2 == q
+@test q^3 == q
+q = UnitQuaternion(sind(90/2), 0, 0, cosd(90/2))
+@test q^2 == UnitQuaternion(sind(180/2), 0, 0, cosd(180/2))
+@test q^0.5 == UnitQuaternion(sind(45/2), 0, 0, cosd(45/2))
+
 p = UnitQuaternion(sqrt(2)/2, 0, 0, sqrt(2)/2)
 q = UnitQuaternion(0, 0, sqrt(2)/2, sqrt(2)/2)
 @test p + q == UnitQuaternion(0.5, 0.5, 0.5, 0.5)
@@ -131,6 +138,16 @@ weights = [1, 1]
 p = UnitQuaternion(0.5, 0.5, 0.5, 0.5)
 @test_approx_eq rotatevector(p, [1, 0, 0]) [0, 1, 0]
 
+p = UnitQuaternion(sind(30/2), 0, 0, cosd(30/2))
+q = UnitQuaternion(sind(60/2), 0, 0, cosd(60/2))
+@test slerp(p, q, 0.5) == UnitQuaternion(sind(45/2), 0, 0, cosd(45/2))
+p = UnitQuaternion(0, sind(10/2), 0, cosd(10/2))
+q = UnitQuaternion(0, sind(90/2), 0, cosd(90/2))
+@test slerp(p, q, 0.1) == UnitQuaternion(0, sind(18/2), 0, cosd(18/2))
+@test slerp(p, q, 0.4) == UnitQuaternion(0, sind(42/2), 0, cosd(42/2))
+@test slerp(p, q, 1.1) == UnitQuaternion(0, sind(98/2), 0, cosd(98/2))
+
+q = UnitQuaternion(0, 0, sqrt(2)/2, sqrt(2)/2)
 @test_approx_eq vector(UnitQuaternion()) [0, 0, 0, 1]
 @test_approx_eq vector(q) [0, 0, sqrt(2)/2, sqrt(2)/2]
 
