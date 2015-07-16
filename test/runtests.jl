@@ -61,6 +61,7 @@ q = UnitQuaternion(0, 0, sqrt(2)/2, sqrt(2)/2)
 
 r = UnitQuaternion(4, 3, -1, -3)
 @test -r == UnitQuaternion(-4, -3, 1, 3)
+@test r == -r
 
 @test q ⊞ [0, 0, 0] == q
 @test p ⊞ (q ⊟ p) == q

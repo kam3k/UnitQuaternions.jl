@@ -1,6 +1,6 @@
 module UnitQuaternions
 
-import Base: +, -, angle, inv, log, mean, show, getindex
+import Base: +, -, angle, hash, inv, log, mean, show, getindex
 
 export UnitQuaternion, ⊕, ⊞, ⊟, axis, covariance, rotatevector, rotateframe, vector
 
@@ -68,11 +68,7 @@ function ⊞(q::UnitQuaternion, rotationvector::AbstractVector)
     q + UnitQuaternion(rotationvector)
 end
 
-function ==(p::UnitQuaternion, q::UnitQuaternion) 
-    # Because -q == q, compare p with q based on signs of their scalar parts
-    sign(p.η) == sign(q.η) ? abs(p.η - q.η) < EPS && all(i->(abs(i) < EPS), p.ϵ - q.ϵ) :
-                             abs(p.η + q.η) < EPS && all(i->(abs(i) < EPS), p.ϵ + q.ϵ)
-end
+==(p::UnitQuaternion, q::UnitQuaternion) = abs(p.η - q.η) < EPS && all(i->(abs(i) < EPS), p.ϵ - q.ϵ)
 
 getindex(q::UnitQuaternion, i::Integer) = i == 4 ? q.η : q.ϵ[i]
 
