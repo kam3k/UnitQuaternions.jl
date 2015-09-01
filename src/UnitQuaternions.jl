@@ -2,7 +2,7 @@ module UnitQuaternions
 
 import Base: +, -, ^, angle, inv, log, mean, show, getindex
 
-export UnitQuaternion, ⊕, ⊞, ⊟, axis, covariance, rotatevector, rotateframe, slerp, vector
+export UnitQuaternion, ⊕, ⊞, ⊟, axis, covariance, rotatevector, rotateframe, rotationmatrix, slerp, vector
 
 const EPS = 1e-9
 
@@ -109,14 +109,22 @@ function mean{T<:Real}(v::AbstractVector{UnitQuaternion}, weights::Vector{T} = o
     return UnitQuaternion(evecs[:,largestevalindex])
 end
 
-function rotateframe(q::UnitQuaternion, v::AbstractVector)
+function rotatevector(q::UnitQuaternion, v::AbstractVector)
+    # Note, the "natural order" is used here (see Trawny or Shuster), which is different
+    # from the textbook by Kuipers, who uses the "historical" (Hamiltonian) order.
     length(v) == 3 || error("Must be a 3-vector.")
     (2.0 * q.η*q.η - 1.0)*v + 2.0 * dot(v, q.ϵ)*q.ϵ + 2.0 * q.η*cross(v, q.ϵ)
 end
 
-function rotatevector(q::UnitQuaternion, v::AbstractVector)
+function rotateframe(q::UnitQuaternion, v::AbstractVector)
+    # Note, the "natural order" is used here (see Trawny or Shuster), which is different
+    # from the textbook by Kuipers, who uses the "historical" (Hamiltonian) order.
     length(v) == 3 || error("Must be a 3-vector.")
     (q.η*q.η - sum(abs2(q.ϵ)))*v + 2.0 * dot(q.ϵ, v)*q.ϵ + 2.0 * q.η*cross(q.ϵ, v)
+end
+
+function rotationmatrix(q::UnitQuaternion)
+    return (+(q) * ⊕(inv(q)))[1:3, 1:3]
 end
 
 function log(q::UnitQuaternion)

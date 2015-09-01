@@ -134,9 +134,15 @@ weights = [1, 1]
 @test_approx_eq log(UnitQuaternion(1, 1, 1, 0)) π/2 * [sqrt(3)/3, sqrt(3)/3, sqrt(3)/3]
 @test_approx_eq log(q) [0, 0, π/4]
 
-@test_approx_eq rotatevector(q, [1, 0, 0]) [0, 1, 0]
+@test_approx_eq rotateframe(q, [1, 0, 0]) [0, 1, 0]
 p = UnitQuaternion(0.5, 0.5, 0.5, 0.5)
-@test_approx_eq rotatevector(p, [1, 0, 0]) [0, 1, 0]
+@test_approx_eq rotateframe(p, [1, 0, 0]) [0, 1, 0]
+
+for i = 1:10
+    r = rand(3)
+    q = UnitQuaternion(rand(4))
+    @test_approx_eq rotatevector(q, r) rotationmatrix(q) * r
+end
 
 p = UnitQuaternion(sind(30/2), 0, 0, cosd(30/2))
 q = UnitQuaternion(sind(60/2), 0, 0, cosd(60/2))
