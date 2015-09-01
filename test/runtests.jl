@@ -140,8 +140,11 @@ p = UnitQuaternion(0.5, 0.5, 0.5, 0.5)
 
 for i = 1:10
     r = rand(3)
+    p = UnitQuaternion(rand(4))
     q = UnitQuaternion(rand(4))
     @test_approx_eq rotatevector(q, r) rotationmatrix(q) * r
+    @test_approx_eq rotatevector(p, r) rotationmatrix(p) * r
+    @test_approx_eq rotationmatrix(p + q) rotationmatrix(p) * rotationmatrix(q)
 end
 
 p = UnitQuaternion(sind(30/2), 0, 0, cosd(30/2))
