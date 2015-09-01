@@ -124,6 +124,7 @@ function rotateframe(q::UnitQuaternion, v::AbstractVector)
 end
 
 function rotationmatrix(q::UnitQuaternion)
+    # Returned rotation matrix implements rotatevector (i.e., rotatevector(q, r) = rotationmatrix(q) * r)
     return (+(q) * ⊕(inv(q)))[1:3, 1:3]
 end
 
