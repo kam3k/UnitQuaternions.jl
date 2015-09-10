@@ -123,11 +123,21 @@ function rotateframe(q::UnitQuaternion, v::AbstractVector)
     (q.η*q.η - sum(abs2(q.ϵ)))*v + 2.0 * dot(q.ϵ, v)*q.ϵ + 2.0 * q.η*cross(q.ϵ, v)
 end
 
+"""
+`rotationmatrix(q)`
+
+Creates a rotation matrix (direction cosine matrix) of the rotation parameterized by the unit quaternion `q`.
+"""
 function rotationmatrix(q::UnitQuaternion)
     # Returned rotation matrix implements rotatevector (i.e., rotatevector(q, r) = rotationmatrix(q) * r)
     return (+(q) * ⊕(inv(q)))[1:3, 1:3]
 end
 
+"""
+`log(q)`
+
+Takes the log of the unit quaternion `q`.
+"""
 function log(q::UnitQuaternion)
     if q == UnitQuaternion()
         return [0.0, 0.0, 0.0]
@@ -138,13 +148,30 @@ function log(q::UnitQuaternion)
     end
 end
 
+"""
+`show(io, q)`
+
+Prints the unit quaternion `q` to the stream `io`.
+"""
 function show(io::IO, q::UnitQuaternion)
     out = @sprintf("ϵ = [%.3f, %.3f, %.3f], η = %.3f", q.ϵ[1], q.ϵ[2], q.ϵ[3], q.η)
     print(io, out)
 end
 
+"""
+`slerp(p, q)`
+
+Performs spherical linear interpolation from unit quaternion `p` to unit quaternion `q`. The
+interpolation parameter `t` specifies the fraction of arc to traverse. The returned unit
+quaternion parameterizes a rotation from `p` to the end point specified by `t`.
+"""
 slerp(p::UnitQuaternion, q::UnitQuaternion, t::Real) = (q + inv(p))^t + p
 
+"""
+`vector(q)`
+
+Returns the fields of the unit quaternion `q` as a 4-vector.
+"""
 vector(q::UnitQuaternion) = [q.ϵ[1], q.ϵ[2], q.ϵ[3], q.η]
 
 ####################################################################################################
