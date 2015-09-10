@@ -1,6 +1,6 @@
 module UnitQuaternions
 
-import Base: +, -, ^, angle, inv, log, mean, show, getindex
+import Base: +, -, ^, ==, ×, angle, inv, log, mean, show, getindex
 
 export UnitQuaternion, ⊕, ⊞, ⊟, axis, covariance, rotatevector, rotateframe, rotationmatrix, slerp, vector
 
