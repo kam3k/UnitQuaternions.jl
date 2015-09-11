@@ -32,10 +32,27 @@ end
 # Constructors
 ####################################################################################################
 
+"""
+`UnitQuaternion()`
+
+Constructs the identity unit quaternion.
+"""
 UnitQuaternion() = UnitQuaternion([0, 0, 0], 1)
 
+"""
+`UnitQuaternion(ϵ1, ϵ2, ϵ3, η)`
+
+Constructs a unit quaternion where the vector part is `[ϵ1, ϵ2, ϵ3]` and the scalar part `η`.
+"""
 UnitQuaternion(ϵ1::Real, ϵ2::Real, ϵ3::Real, η::Real) = UnitQuaternion([ϵ1, ϵ2, ϵ3], η)
 
+"""
+`UnitQuaternion(v)`
+
+Constructs a unit quaternion from the vector `v`. If `v` is a 4-vector, its first three elements are
+taken as the vector part and its fourth element is taken as the scalar part. If `v` is a 3-vector, it
+is assumed to be a rotation vector and the rotation is converted to a unit quaternion.
+"""
 function UnitQuaternion(v::AbstractVector) 
     if length(v) == 3
         θ = norm(v)
@@ -51,38 +68,109 @@ end
 # Operators
 ####################################################################################################
 
+"""
+`+(q)`
+
+Applies the left-hand compound operator to the unit quaternion `q`, which returns a 4x4 matrix.
+"""
 +(q::UnitQuaternion) = [q.η * eye(3) - ×(q.ϵ) q.ϵ; -q.ϵ' q.η]
 
+"""
+`+(p, q)`
+
+Calculates the quaternion product `p + q` using the left-hand compound operator.
+"""
 +(p::UnitQuaternion, q::UnitQuaternion) = UnitQuaternion(+(p) * vector(q))
 
+"""
+`-(q)`
+
+Negates the unit quaternion `q`.
+"""
 -(q::UnitQuaternion) = UnitQuaternion(-q.ϵ, -q.η)
 
 ^(q::UnitQuaternion, n::Integer) = UnitQuaternion(2n * log(q))
+
+"""
+`^(q, n)`
+
+Raises the unit quaternion `q` to the power of `n`.
+"""
 ^(q::UnitQuaternion, n::Real) = UnitQuaternion(2n * log(q))
 
+"""
+`⊕(q)`
+
+Applies the right-hand compound operator to the unit quaternion `q`, which returns a 4x4 matrix.
+"""
 ⊕(q::UnitQuaternion) = [q.η * eye(3) + ×(q.ϵ) q.ϵ; -q.ϵ' q.η]
 
+"""
+`⊕(p, q)`
+
+Calculates the quaternion product `q + p` using the right-hand compound operator (i.e., `p ⊕ q`).
+"""
 ⊕(p::UnitQuaternion, q::UnitQuaternion) = UnitQuaternion(⊕(p) * vector(q))
 
+"""
+`⊟(p, q)`
+
+Calculates the rotation from unit quaternion `p` to unit quaternion `q` (i.e., their difference)
+and converts the result to a rotation vector.
+"""
 ⊟(p::UnitQuaternion, q::UnitQuaternion) = 2.0 * log(inv(q) + p)
 
+"""
+`⊞(q, rotationvector)`
+
+Perturbs the unit quaternion `q` by the rotation vector `rotationvector`. Equivalent to
+`q + UnitQuaternion(rotationvector)`.
+"""
 function ⊞(q::UnitQuaternion, rotationvector::AbstractVector) 
     length(rotationvector) == 3 || error("Must be 3-vector.")
     q + UnitQuaternion(rotationvector)
 end
 
+"""
+`==(p, q)`
+
+Checks if unit quaterions `p` and `q` are equal.
+"""
 ==(p::UnitQuaternion, q::UnitQuaternion) = abs(p.η - q.η) < EPS && all(i->(abs(i) < EPS), p.ϵ - q.ϵ)
 
+"""
+`getindex(q, i)`
+
+Returns the `i`-th element of the unit quaternion `q`, where `i` = 1:3 form the vector part of `q` 
+and `i` = 4 is the scalar part of `q`.
+"""
 getindex(q::UnitQuaternion, i::Integer) = i == 4 ? q.η : q.ϵ[i]
 
 ####################################################################################################
 # Methods
 ####################################################################################################
 
+"""
+`angle(q)`
+
+Returns the angle of rotation of the unit quaternion `q`.
+"""
 angle(q::UnitQuaternion) = 2.0 * atan2(norm(q.ϵ), q.η)
 
+"""
+`axis(q)`
+
+Returns the axis of rotation of the unit quaternion `q`.
+"""
 axis(q::UnitQuaternion) = norm(q.ϵ) > EPS ? q.ϵ / norm(q.ϵ) : [0.0, 0.0, 1.0]
 
+"""
+`covariance(qs, qmean, weights)`
+
+Returns the 3x3 covariance matrix of a vector of unit quaternions `qs` given the unit quaternion 
+mean `qmean`. The optional argument `weights` is a vector of weights used to calculate a weighted 
+covariance of the `qs`. If no weights are given, all unit quaternions are weighted equally.
+"""
 function covariance{T<:Real}(v::AbstractVector{UnitQuaternion}, qmean::UnitQuaternion,
                              weights::Vector{T} = ones(length(v)))
     normweights = map(w -> w/sum(weights), weights)
@@ -94,21 +182,46 @@ function covariance{T<:Real}(v::AbstractVector{UnitQuaternion}, qmean::UnitQuate
     return cov
 end
 
-function covariance{T<:Real}(v::AbstractVector{UnitQuaternion}, weights::Vector{T} = ones(length(v)))
-    qmean = mean(v, weights)
-    return covariance(v, qmean, weights)
+"""
+`covariance(qs, weights)`
+
+Returns the 3x3 covariance matrix of a vector of unit quaternions `qs`. The optional argument `weights` is
+a vector of weights used to calculate a weighted covariance of the `qs`. If no weights are given, all unit
+quaternions are weighted equally.
+"""
+function covariance{T<:Real}(qs::AbstractVector{UnitQuaternion}, weights::Vector{T} = ones(length(qs)))
+    qmean = mean(qs, weights)
+    return covariance(qs, qmean, weights)
 end
 
+"""
+`inv(q)`
+
+Calculates the inverse of the unit quaternion `q`.
+"""
 inv(q::UnitQuaternion) = UnitQuaternion(-q.ϵ, q.η)
 
-function mean{T<:Real}(v::AbstractVector{UnitQuaternion}, weights::Vector{T} = ones(length(v)))
+"""
+`mean(qs, weights)`
+
+Returns the quaternion mean of a vector of unit quaternions `qs`. The optional argument `weights` is
+a vector of weights used to calculate a weighted mean of the `qs`. If no weights are given, all unit
+quaternions are weighted equally.
+"""
+function mean{T<:Real}(qs::AbstractVector{UnitQuaternion}, weights::Vector{T} = ones(length(qs)))
     normweights = map(w -> w/sum(weights), weights)
-    M = sum([w * vector(q) * vector(q)' for (w, q) in zip(normweights, v)])
+    M = sum([w * vector(q) * vector(q)' for (w, q) in zip(normweights, qs)])
     evals, evecs = eig(M)
     largestevalindex = sortperm(evals)[end]
     return UnitQuaternion(evecs[:,largestevalindex])
 end
 
+"""
+`rotatevector(q, v)`
+
+Given a unit quaternion `q` and a 3-vector `v`, performs a vector rotation and
+returns the rotated vector `v`.
+"""
 function rotatevector(q::UnitQuaternion, v::AbstractVector)
     # Note, the "natural order" is used here (see Trawny or Shuster), which is different
     # from the textbook by Kuipers, who uses the "historical" (Hamiltonian) order.
@@ -116,6 +229,12 @@ function rotatevector(q::UnitQuaternion, v::AbstractVector)
     (2.0 * q.η*q.η - 1.0)*v + 2.0 * dot(v, q.ϵ)*q.ϵ + 2.0 * q.η*cross(v, q.ϵ)
 end
 
+"""
+`rotateframe(q, v)`
+
+Given a unit quaternion `q` and a 3-vector `v`, performs a coordinate frame rotation and
+returns `v` expressed in the rotated coordinate frame.
+"""
 function rotateframe(q::UnitQuaternion, v::AbstractVector)
     # Note, the "natural order" is used here (see Trawny or Shuster), which is different
     # from the textbook by Kuipers, who uses the "historical" (Hamiltonian) order.
@@ -170,7 +289,7 @@ slerp(p::UnitQuaternion, q::UnitQuaternion, t::Real) = (q + inv(p))^t + p
 """
 `vector(q)`
 
-Returns the fields of the unit quaternion `q` as a 4-vector.
+Returns the elements of the unit quaternion `q` as a 4-vector.
 """
 vector(q::UnitQuaternion) = [q.ϵ[1], q.ϵ[2], q.ϵ[3], q.η]
 
@@ -178,6 +297,11 @@ vector(q::UnitQuaternion) = [q.ϵ[1], q.ϵ[2], q.ϵ[3], q.η]
 # Utility Functions
 ####################################################################################################
 
+"""
+`×(a)`
+
+Returns the skew-symmetric cross product matrix of the 3-vector `a`.
+"""
 function ×(a::AbstractVector)  
     length(a) == 3 || error("Must be a 3-vector.")
     return [0.0 -a[3] a[2]; a[3] 0.0 -a[1]; -a[2] a[1] 0.0]
