@@ -223,10 +223,8 @@ Given a unit quaternion `q` and a 3-vector `v`, performs a vector rotation and
 returns the rotated vector `v`.
 """
 function rotatevector(q::UnitQuaternion, v::AbstractVector)
-    # Note, the "natural order" is used here (see Trawny or Shuster), which is different
-    # from the textbook by Kuipers, who uses the "historical" (Hamiltonian) order.
     length(v) == 3 || error("Must be a 3-vector.")
-    (2.0 * q.η*q.η - 1.0)*v + 2.0 * dot(v, q.ϵ)*q.ϵ + 2.0 * q.η*cross(v, q.ϵ)
+    (2.0 * q.η^2 - 1.0) * v + (2.0 * q.η * ×(q.ϵ)) * v + (2.0 * q.ϵ * q.ϵ') * v
 end
 
 """
@@ -236,10 +234,8 @@ Given a unit quaternion `q` and a 3-vector `v`, performs a coordinate frame rota
 returns `v` expressed in the rotated coordinate frame.
 """
 function rotateframe(q::UnitQuaternion, v::AbstractVector)
-    # Note, the "natural order" is used here (see Trawny or Shuster), which is different
-    # from the textbook by Kuipers, who uses the "historical" (Hamiltonian) order.
     length(v) == 3 || error("Must be a 3-vector.")
-    (q.η*q.η - sum(abs2(q.ϵ)))*v + 2.0 * dot(q.ϵ, v)*q.ϵ + 2.0 * q.η*cross(q.ϵ, v)
+    (2.0 * q.η^2 - 1.0) * v - (2.0 * q.η * ×(q.ϵ)) * v + (2.0 * q.ϵ * q.ϵ') * v
 end
 
 """
@@ -248,7 +244,9 @@ end
 Creates a rotation matrix (direction cosine matrix) of the rotation parameterized by the unit quaternion `q`.
 """
 function rotationmatrix(q::UnitQuaternion)
-    # Returned rotation matrix implements rotatevector (i.e., rotatevector(q, r) = rotationmatrix(q) * r)
+    # Note, the "natural order" is used here (see Trawny or Shuster), which is different
+    # from the textbook by Kuipers, who uses the "historical" (Hamiltonian) order.
+    # Returned rotation matrix implements rotateframe (i.e., rotateframe(q, r) = rotationmatrix(q) * r)
     return (+(q) * ⊕(inv(q)))[1:3, 1:3]
 end
 
