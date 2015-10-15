@@ -276,7 +276,7 @@ function show(io::IO, q::UnitQuaternion)
 end
 
 """
-`slerp(p, q)`
+`slerp(p, q, t)`
 
 Performs spherical linear interpolation from unit quaternion `p` to unit quaternion `q`. The
 interpolation parameter `t` specifies the fraction of arc to traverse. The returned unit
