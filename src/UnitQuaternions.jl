@@ -83,19 +83,11 @@ Calculates the quaternion product `p + q` using the left-hand compound operator.
 +(p::UnitQuaternion, q::UnitQuaternion) = UnitQuaternion(+(p) * vector(q))
 
 """
-`-(q)`
-
-Negates the unit quaternion `q`.
-"""
--(q::UnitQuaternion) = UnitQuaternion(-q.ϵ, -q.η)
-
-^(q::UnitQuaternion, n::Integer) = UnitQuaternion(2n * log(q))
-
-"""
 `^(q, n)`
 
 Raises the unit quaternion `q` to the power of `n`.
 """
+^(q::UnitQuaternion, n::Integer) = UnitQuaternion(2n * log(q))
 ^(q::UnitQuaternion, n::Real) = UnitQuaternion(2n * log(q))
 
 """

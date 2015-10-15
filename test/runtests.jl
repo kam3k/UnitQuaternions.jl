@@ -66,10 +66,6 @@ q = UnitQuaternion(0, 0, sqrt(2)/2, sqrt(2)/2)
 @test q + p == UnitQuaternion(0.5, -0.5, 0.5, 0.5)
 @test p ⊕ q == UnitQuaternion(0.5, -0.5, 0.5, 0.5)
 
-r = UnitQuaternion(4, 3, -1, -3)
-@test -r == UnitQuaternion(-4, -3, 1, 3)
-@test r == -r
-
 @test q ⊞ [0, 0, 0] == q
 @test p ⊞ (q ⊟ p) == q
 @test_approx_eq (q ⊞ [0.1, 0.2, 0.3]) ⊟ q [0.1, 0.2, 0.3]
