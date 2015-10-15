@@ -55,7 +55,7 @@ A 3-vector of real numbers as the only argument is assumed to be a rotation vect
 
 ### Operators
 
-##### Quaternion product
+#### Quaternion product
 	julia> q + p
 	ϵ = [-0.075, 0.820, -0.224], η = 0.522
 Returns the quaternion product **q** &otimes; **p**. Equivalent to `p ⊕ q`.
@@ -64,7 +64,7 @@ Returns the quaternion product **q** &otimes; **p**. Equivalent to `p ⊕ q`.
 	ϵ = [-0.721, 0.174, 0.422], η = 0.522
 Returns the quaternion product **p** &otimes; **q**. Equivalent to `p + q`.
 
-##### Compound operators
+#### Compound operators
 For background information on compound operators, see [Pose estimation using linearized rotations and quaternion algebra](http://www.sciencedirect.com/science/article/pii/S0094576510002407) by Barfoot *et al*.
  
     julia> +(q)
