@@ -13,13 +13,13 @@ and then add it to your current session with
 ## Description
 Unit quaternions in this package are represented by the 4 &times; 1 column 
 
-**q** = [**&epsilon;** &eta;]<sup>T</sup>
+**q** = [**&epsilon;**<sup>T</sup> &eta;]<sup>T</sup>
 
 where **&epsilon;** is a 3-vector (the *vector* part of the unit quaternion) and &eta; is a scalar (the *scalar* part of the unit quaternion). Because **q**&equiv;-**q**, &eta; &ge; 0 is always maintained to make every **q** unique.
 
 Given a rotation parameterized by an axis of rotation **a** and an angle &theta;, the same rotation parameterized by a unit quaternion is
 
-**q** = [**a**sin(&theta;/2) cos(&theta;/2)]<sup>T</sup>.
+**q** = [**a**<sup>T</sup>sin(&theta;/2) cos(&theta;/2)]<sup>T</sup>.
 
 This package supports several constructors, operators, and methods on unit quaternions.
 
