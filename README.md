@@ -147,7 +147,7 @@ Returns the 3 &times; 3 covariance matrix of a vector of unit quaternions (`[p,q
 
 	julia> inv(q)
 	ϵ = [-0.183, -0.365, -0.548], η = 0.730
-Returns the inverse of **q**. Recall that for unit quaternions, the inverse is simply **q**<sup>-1</sup> = [-**&epsilon;** &eta;]<sup>T</sup>.
+Returns the inverse of **q**. Recall that for unit quaternions, the inverse is simply **q**<sup>-1</sup> = [-**&epsilon;**<sup>T</sup> &eta;]<sup>T</sup>.
 
 	julia> mean([q,p])
 	ϵ = [-0.312, 0.485, 0.173], η = 0.799
